@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import './App.css';
-import { submitData } from './api/api';
+import { submitData, getAudioBuffer } from './api/api';
 
 function App() {
   const [inputText, setInputText] = useState('');
   const [result, setResult] = useState('');
+  const [audioBuffer, setAudioBuffer] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const [fromLang, setFromLang] = useState('');
@@ -20,6 +21,20 @@ function App() {
       setResult('Error: ' + error.message);
     }
     setIsLoading(false);
+  };
+
+  const playAudio = async () => {
+    try {
+      const response = await getAudioBuffer(inputText);
+      setAudioBuffer(response); 
+    } catch (error) {
+      setResult('Error: ' + error.message);
+    }
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const audioBufferSource = audioContext.createBufferSource();
+    audioBufferSource.buffer = audioBuffer;
+    audioBufferSource.connect(audioContext.destination);
+    audioBufferSource.start();
   };
 
   return (
@@ -90,7 +105,9 @@ function App() {
         {result && (
           <div className="result">
             <h3>Word:</h3>
+            <button onClick={playAudio}>Play Audio</button>
             <pre>{result.data.word}</pre>
+
             <h3>Explaination:</h3>
             <pre>{result.data.translation}</pre>
           </div>
