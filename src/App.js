@@ -25,16 +25,21 @@ function App() {
 
   const playAudio = async () => {
     try {
-      const response = await getAudioBuffer(inputText);
-      setAudioBuffer(response); 
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const audioBufferSource = audioContext.createBufferSource();
+      if (audioBuffer) {
+        audioBufferSource.buffer = audioBuffer;
+      } else {
+        const response = await getAudioBuffer(inputText);
+        audioBufferSource.buffer = response;
+        setAudioBuffer(response); 
+      }
+      audioBufferSource.connect(audioContext.destination);
+      audioBufferSource.start();
     } catch (error) {
       setResult('Error: ' + error.message);
     }
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const audioBufferSource = audioContext.createBufferSource();
-    audioBufferSource.buffer = audioBuffer;
-    audioBufferSource.connect(audioContext.destination);
-    audioBufferSource.start();
+    
   };
 
   return (
