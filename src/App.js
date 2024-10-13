@@ -17,6 +17,7 @@ function App() {
     try {
       const response = await submitData(fromLang, toLang, inputText);
       setResult(response);
+      setAudioBuffer(null);
     } catch (error) {
       setResult('Error: ' + error.message);
     }
