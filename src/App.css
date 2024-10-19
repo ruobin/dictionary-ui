@@ -98,3 +98,8 @@ button:hover {
   line-height: 1.6;
   overflow-x: auto;
 }
+
+
+.audio-label {
+  color: grey;
+}

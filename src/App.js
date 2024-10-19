@@ -11,11 +11,24 @@ function App() {
   const [fromLang, setFromLang] = useState({name: 'English', code: 'en-US'});
   const [toLang, setToLang] = useState({ name: 'English', code: 'en-US' });
 
+  function unlockAudio(audioContext) {
+    if (audioContext.state === 'suspended') {
+      const unlock = function () {
+        audioContext.resume().then(() => {
+          document.body.removeEventListener('touchstart', unlock);
+          document.body.removeEventListener('touchend', unlock);
+        });
+      };
+      document.body.addEventListener('touchstart', unlock, false);
+      document.body.addEventListener('touchend', unlock, false);
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const response = await submitData(fromLang.name, toLang.name, inputText);
+      const response = await submitData(fromLang.name, toLang.name, inputText.toLowerCase());
       setResult(response);
       setAudioBuffer(null);
     } catch (error) {
@@ -27,18 +40,28 @@ function App() {
   const playAudio = async () => {
     try {
       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+      unlockAudio(audioContext);
+
       const audioBufferSource = audioContext.createBufferSource();
       if (audioBuffer) {
+        console.log('play cached audioBuffer');
         audioBufferSource.buffer = audioBuffer;
       } else {
+        console.log('fetching getAudioBuffer...');
         const response = await getAudioBuffer(fromLang.code, inputText);
         audioBufferSource.buffer = response;
         setAudioBuffer(response); 
       }
-      audioBufferSource.connect(audioContext.destination);
-      audioBufferSource.start();
+      // Create a MediaStreamAudioDestinationNode
+      const destination = audioContext.createMediaStreamDestination();
+      audioBufferSource.connect(destination);
+      audioBufferSource.connect(audioContext.destination); // Connect to the default destination as well
+
+      audioBufferSource.start(0);
     } catch (error) {
       setResult('Error: ' + error.message);
+      console.error('Error playing audio:', error);
     }
     
   };
@@ -46,7 +69,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Dictionary Powered by AI</h1>
+        <h1>Dictionary Powered by AI(beta)</h1>
       </header>
       <main className="App-main">
         <form onSubmit={handleSubmit}>
@@ -117,6 +140,7 @@ function App() {
           <div className="result">
             <h3>Word:</h3>
             <button onClick={playAudio}>Play Audio</button>
+            <label htmlFor="playAudio" className="audio-label">(Tips: On iPhone, Audio will only play when silence mode is off!)</label>
             <pre>{result.data.word}</pre>
 
             <h3>Explaination:</h3>
