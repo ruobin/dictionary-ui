@@ -8,14 +8,14 @@ function App() {
   const [audioBuffer, setAudioBuffer] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [fromLang, setFromLang] = useState('');
-  const [toLang, setToLang] = useState('');
+  const [fromLang, setFromLang] = useState({name: 'English', code: 'en-US'});
+  const [toLang, setToLang] = useState({ name: 'English', code: 'en-US' });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const response = await submitData(fromLang, toLang, inputText);
+      const response = await submitData(fromLang.name, toLang.name, inputText);
       setResult(response);
       setAudioBuffer(null);
     } catch (error) {
@@ -31,7 +31,7 @@ function App() {
       if (audioBuffer) {
         audioBufferSource.buffer = audioBuffer;
       } else {
-        const response = await getAudioBuffer(inputText);
+        const response = await getAudioBuffer(fromLang.code, inputText);
         audioBufferSource.buffer = response;
         setAudioBuffer(response); 
       }
@@ -51,58 +51,63 @@ function App() {
       <main className="App-main">
         <form onSubmit={handleSubmit}>
           <label for="from">From:</label>
-          <select value={fromLang} onChange={(e) => setFromLang(e.target.value)}>
-            <option value="English">English</option>
-            <option value="Chinese">Chinese</option>
-            <option value="Japanese">Japanese</option>
-            <option value="Korean">Korean</option>
-            <option value="French">French</option>
-            <option value="Spanish">Spanish</option>
-            <option value="German">German</option>
-            <option value="Italian">Italian</option>
-            <option value="Portuguese">Portuguese</option>
-            <option value="Russian">Russian</option>
-            <option value="Arabic">Arabic</option>
-            <option value="Hindi">Hindi</option>
-            <option value="Bengali">Bengali</option>
-            <option value="Dutch">Dutch</option>
-            <option value="Polish">Polish</option>
-            <option value="Turkish">Turkish</option>
-            <option value="Vietnamese">Vietnamese</option>
-            <option value="Thai">Thai</option>
-            <option value="Indonesian">Indonesian</option>
-            <option value="Malay">Malay</option>
-            <option value="Filipino">Filipino</option>
+          <select value={fromLang.name} onChange={(e) => 
+            setFromLang({name: e.target.value, code: e.target.options[e.target.selectedIndex].getAttribute('code')})
+          }>
+            <option value="English" code="en-US">English</option>
+            <option value="Chinese" code="zh-CN">Chinese</option>
+            <option value="Japanese" code="ja-JP">Japanese</option>
+            <option value="Korean" code="ko-KR">Korean</option>
+            <option value="French" code="fr-FR">French</option>
+            <option value="Spanish" code="es-ES">Spanish</option>
+            <option value="German" code="de-DE">German</option>
+            <option value="Italian" code="it-IT">Italian</option>
+            <option value="Portuguese" code="pt-BR">Portuguese</option>
+            <option value="Russian" code="ru-RU">Russian</option>
+            <option value="Arabic" code="ar-AR">Arabic</option>
+            <option value="Hindi" code="hi-IN">Hindi</option>
+            <option value="Bengali" code="bn-BD">Bengali</option>
+            <option value="Dutch" code="nl-NL">Dutch</option>
+            <option value="Polish" code="pl-PL">Polish</option>
+            <option value="Turkish" code="tr-TR">Turkish</option>
+            <option value="Vietnamese" code="vi-VN">Vietnamese</option>
+            <option value="Thai" code="th-TH">Thai</option>
+            <option value="Indonesian" code="id-ID">Indonesian</option>
+            <option value="Malay" code="ms-MY">Malay</option>
+            <option value="Filipino" code="fil-PH">Filipino</option>
           </select>
           <label for="to">To:</label>
-          <select value={toLang} onChange={(e) => setToLang(e.target.value)}>
-            <option value="English">English</option>
-            <option value="Chinese">Chinese</option>
-            <option value="Japanese">Japanese</option>
-            <option value="Korean">Korean</option>
-            <option value="French">French</option>
-            <option value="Spanish">Spanish</option>
-            <option value="German">German</option>
-            <option value="Italian">Italian</option>
-            <option value="Portuguese">Portuguese</option>
-            <option value="Russian">Russian</option>
-            <option value="Arabic">Arabic</option>
-            <option value="Hindi">Hindi</option>
-            <option value="Bengali">Bengali</option>
-            <option value="Dutch">Dutch</option>
-            <option value="Polish">Polish</option>
-            <option value="Turkish">Turkish</option>
-            <option value="Vietnamese">Vietnamese</option>
-            <option value="Thai">Thai</option>
-            <option value="Indonesian">Indonesian</option>
-            <option value="Malay">Malay</option>
-            <option value="Filipino">Filipino</option>
+          <select value={toLang.name} onChange={(e) => 
+            setToLang({name: e.target.value, code: e.target.options[e.target.selectedIndex].getAttribute('code')})
+          }>
+            <option value="English" code="en-US">English</option>
+            <option value="Chinese" code="zh-CN">Chinese</option>
+            <option value="Japanese" code="ja-JP">Japanese</option>
+            <option value="Korean" code="ko-KR">Korean</option>
+            <option value="French" code="fr-FR">French</option>
+            <option value="Spanish" code="es-ES">Spanish</option>
+            <option value="German" code="de-DE">German</option>
+            <option value="Italian" code="it-IT">Italian</option>
+            <option value="Portuguese" code="pt-BR">Portuguese</option>
+            <option value="Russian" code="ru-RU">Russian</option>
+            <option value="Arabic" code="ar-AR">Arabic</option>
+            <option value="Hindi" code="hi-IN">Hindi</option>
+            <option value="Bengali" code="bn-BD">Bengali</option>
+            <option value="Dutch" code="nl-NL">Dutch</option>
+            <option value="Polish" code="pl-PL">Polish</option>
+            <option value="Turkish" code="tr-TR">Turkish</option>
+            <option value="Vietnamese" code="vi-VN">Vietnamese</option>
+            <option value="Thai" code="th-TH">Thai</option>
+            <option value="Indonesian" code="id-ID">Indonesian</option>
+            <option value="Malay" code="ms-MY">Malay</option>
+            <option value="Filipino" code="fil-PH">Filipino</option>
           </select>
           <input
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder="Ask AI the word..."
+            placeholder="Ask AI a word..."
+            maxLength={50}
           />
           <button type="submit" disabled={isLoading}>
             {isLoading ? 'Thinking...' : 'Submit'}
