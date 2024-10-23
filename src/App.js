@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './App.css';
 import { submitData, getAudioBuffer } from './api/api';
+import logo from './dictionary.png';
 
 function App() {
   const [inputText, setInputText] = useState('');
@@ -69,6 +70,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
+        <img src={logo} alt="logo" className="App-logo" />
         <h1>Dictionary Powered by AI</h1>
       </header>
       <main className="App-main">
