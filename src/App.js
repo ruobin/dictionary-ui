@@ -146,12 +146,17 @@ function App() {
             <pre>{result.data.word}</pre>
 
             <h3>Explaination:</h3>
-            <pre>{result.data.translation}</pre>
+            <pre dangerouslySetInnerHTML={parseBoldText(result.data.translation)} />
           </div>
         )}
       </main>
     </div>
   );
 }
+
+const parseBoldText = (text) => {
+  const boldText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  return { __html: boldText };
+};
 
 export default App;
